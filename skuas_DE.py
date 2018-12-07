@@ -13,12 +13,24 @@ def model(y, t, params):
     return [drdt1, drdt2]
 
 
-def logistic_curve(t, t_shift, sigma, min_value, max_value): #TODO the max value here is actually min+max
-    return (max_value/min_value)/(1+np.exp(-sigma*(t-t_shift))) + min_value
+def logistic_curve(t, t_shift, sigma, min_value, max_value):
+    return (max_value-min_value)/(1+np.exp(-sigma*(t-t_shift))) + min_value
+
+
+def carrying_capacity(t, t_control, sigma, min_capacity, max_capacity):
+    return max_capacity if t < t_control else logistic_curve(t - t_control, np.log(99) / sigma, sigma, min_capacity, max_capacity)
+
+
+
+def plot_carrying_capacity(t_control, sigma, min_capacity, max_capacity, time_horison = 25):
+    t_vals = np.arange(0, time_horison, 0.01)
+    yvals = [carrying_capacity(t, t_control, sigma, min_capacity, max_capacity) for t in t_vals]
+    plt.plot(t_vals, yvals)
+    plt.show()
 
 
 if __name__ == '__main__':
-    y0 = [14,12]
+    plot_carrying_capacity(t_control=2, sigma=5, min_capacity=1, max_capacity=10)
 
 
     param_struct = namedtuple('Parameters', ['preygrowthrate', 'preycarryingcapacity',
