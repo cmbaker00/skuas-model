@@ -7,9 +7,7 @@ from collections import namedtuple
 def model(y, t, params):
     r = y[0]
     pred1 = y[1]
-    k = params.carrying_capacity_function(t, params.erad_time, params.sigma,
-                                          params.min_carrying_capacity,
-                                          params.preycarryingcapacity)
+    k = params.carrying_capacity_function(t, params)
     drdt = params.preygrowthrate*r*(1-r/k) - .18*r*pred1
     dp1dt = params.preygrowthrate*pred1*(1-pred1/(k*r))
     return [drdt, dp1dt]
@@ -23,6 +21,10 @@ def carrying_capacity(t, t_control, sigma, min_capacity, max_capacity):
     return max_capacity if t < t_control else logistic_curve(t - t_control, np.log(99) / sigma, sigma, min_capacity, max_capacity)
 
 
+def carrying_capacity_params(t, params):
+    return carrying_capacity(t, params.erad_time, params.sigma,
+                                          params.min_carrying_capacity,
+                                          params.preycarryingcapacity)
 
 def plot_carrying_capacity(t_control, sigma, min_capacity, max_capacity, time_horison = 25):
     t_vals = np.arange(0, time_horison, 0.01)
@@ -42,7 +44,7 @@ if __name__ == '__main__':
                                              'carrying_capacity_function','sigma'])
     params = param_struct(preygrowthrate=1, preycarryingcapacity=15,
                           erad_time=2, min_carrying_capacity=y0[0]/2,
-                          carrying_capacity_function=carrying_capacity, sigma = .5)
+                          carrying_capacity_function=carrying_capacity_params, sigma = .5)
 
 
     param = .1
