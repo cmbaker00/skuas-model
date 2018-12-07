@@ -7,10 +7,12 @@ from collections import namedtuple
 def model(y, t, params):
     r = y[0]
     pred1 = y[1]
-    k = params.preycarryingcapacity if (t < params.erad_time) else params.min_carrying_capacity
-    drdt1 = params.preygrowthrate*r*(1-r/k) - .18*r*pred1
-    drdt2 = params.preygrowthrate*pred1*(1-pred1/(k*r))
-    return [drdt1, drdt2]
+    k = params.carrying_capacity_function(t, params.erad_time, params.sigma,
+                                          params.min_carrying_capacity,
+                                          params.preycarryingcapacity)
+    drdt = params.preygrowthrate*r*(1-r/k) - .18*r*pred1
+    dp1dt = params.preygrowthrate*pred1*(1-pred1/(k*r))
+    return [drdt, dp1dt]
 
 
 def logistic_curve(t, t_shift, sigma, min_value, max_value):
@@ -26,16 +28,21 @@ def plot_carrying_capacity(t_control, sigma, min_capacity, max_capacity, time_ho
     t_vals = np.arange(0, time_horison, 0.01)
     yvals = [carrying_capacity(t, t_control, sigma, min_capacity, max_capacity) for t in t_vals]
     plt.plot(t_vals, yvals)
+    plt.xlabel('Years')
+    plt.ylabel('Carrying capacity')
     plt.show()
 
 
 if __name__ == '__main__':
-    plot_carrying_capacity(t_control=2, sigma=5, min_capacity=1, max_capacity=10)
+    plot_carrying_capacity(t_control=2, sigma=.5, min_capacity=1, max_capacity=10)
 
-
+    y0 = (15,10)
     param_struct = namedtuple('Parameters', ['preygrowthrate', 'preycarryingcapacity',
-                                             'erad_time','min_carrying_capacity'])
-    params = param_struct(preygrowthrate=1, preycarryingcapacity=15, erad_time=2, min_carrying_capacity=y0[0]/2)
+                                             'erad_time','min_carrying_capacity',
+                                             'carrying_capacity_function','sigma'])
+    params = param_struct(preygrowthrate=1, preycarryingcapacity=15,
+                          erad_time=2, min_carrying_capacity=y0[0]/2,
+                          carrying_capacity_function=carrying_capacity, sigma = .5)
 
 
     param = .1
