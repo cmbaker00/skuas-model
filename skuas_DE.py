@@ -16,6 +16,8 @@ def model(y, t, params):
 def logistic_curve(t, t_shift, sigma, min_value, max_value): #TODO the max value here is actually min+max
     return (max_value/min_value)/(1+np.exp(-sigma*(t-t_shift))) + min_value
 
+def next_function():
+    pass
 
 if __name__ == '__main__':
     y0 = [14,12]
