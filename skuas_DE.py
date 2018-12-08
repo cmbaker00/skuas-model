@@ -35,8 +35,11 @@ def plot_carrying_capacity(t_control, sigma, min_capacity, max_capacity, time_ho
     plt.show()
 
 
+def plot_carrying_capacity_params(params, time_horison = 25):
+    plot_carrying_capacity(params.erad_time, params.sigma, params.min_carrying_capacity,
+                           params.prey_carrying_capacity, time_horison)
+
 if __name__ == '__main__':
-    plot_carrying_capacity(t_control=2, sigma=.5, min_capacity=1, max_capacity=10)
 
     y0 = (15,10)
     param_struct = namedtuple('Parameters', ['prey_growth_rate', 'prey_carrying_capacity',
@@ -46,6 +49,7 @@ if __name__ == '__main__':
                           erad_time=2, min_carrying_capacity=y0[0]/2,
                           carrying_capacity_function=carrying_capacity_params, sigma = .5)
 
+    plot_carrying_capacity_params(params)
 
     param = .1
     t = np.linspace(0,20,1000)
