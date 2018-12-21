@@ -69,21 +69,21 @@ if __name__ == '__main__':
                                              'mature_p1p2','mature_p2p3',
                                              'p1_consumption','p2p3_consumption','p2_reprod_rate',
                                              'p3_reprod_rate','lifespan'])
-    params = param_struct(prey_growth_rate=1, prey_carrying_capacity=15,
-                          erad_time=2, min_carrying_capacity=y0[0]*.4,
-                          carrying_capacity_function=carrying_capacity_params, sigma = .11, mature_p1p2=1,
-                          mature_p2p3=1/7,
-                          p1_consumption=.15, p2p3_consumption=.2, p2_reprod_rate=0,
-                          p3_reprod_rate=2,lifespan=30)
+    model_params = param_struct(prey_growth_rate=1, prey_carrying_capacity=15,
+                                erad_time=2, min_carrying_capacity=y0[0]*.4,
+                                carrying_capacity_function=carrying_capacity_params, sigma = .11, mature_p1p2=1,
+                                mature_p2p3=1/7,
+                                p1_consumption=.15, p2p3_consumption=.2, p2_reprod_rate=0,
+                                p3_reprod_rate=2, lifespan=30)
 
-    plot_carrying_capacity_params(params)
+    plot_carrying_capacity_params(model_params)
 
     param = .1
-    t = np.linspace(0,20,1000)
-    y = odeint(lambda y, t: model(y,t,params), y0, t)
+    t_vec = np.linspace(0,20,1000)
+    sol = odeint(lambda y, t: model(y, t, model_params), y0, t_vec)
 
     # plot results
-    plt.plot(t,y)
+    plt.plot(t_vec, sol)
     plt.xlabel('time')
     plt.ylabel('y(t)')
     plt.show()
