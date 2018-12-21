@@ -5,12 +5,33 @@ from collections import namedtuple
 
 
 def model(y, t, params):
-    r = y[0]
+    # Define some parameters to make equations easier to read
+
+    #State variables
+    resource = y[0]
     pred1 = y[1]
+    pred2 = y[2]
+    pred3 = y[3]
+
+    #Composite parameters
     k = params.carrying_capacity_function(t, params)
-    drdt = params.prey_growth_rate*r*(1-r/k) - .18*r*pred1
-    dp1dt = params.prey_growth_rate*pred1*(1-pred1/(k*r))
-    return [drdt, dp1dt]
+    death_rate = 1/params.lifespan
+    food_availability = 1-(pred1+pred2+pred3)/resource
+
+    # Model
+    drdt = params.prey_growth_rate*resource*(1-resource/k) - \
+           params.p1_consumption*pred1 - \
+           params.p2p3_consumption*(pred2+pred3)
+    dp1dt = params.p2_reprod_rate*pred2 + \
+            params.p3_reprod_rate*pred3 - \
+            params.mature_p1p2*pred1 - \
+            death_rate/food_availability
+    dp2dt = params.mature_p1p2*pred1 - \
+            params.mature_p2p3*pred2 - \
+            death_rate/food_availability
+    dp3dt = params.mature_p2p3*pred2 - \
+            death_rate/food_availability
+    return [drdt, dp1dt,dp2dt,dp3dt]
 
 
 def logistic_curve(t, t_shift, sigma, min_value, max_value):
@@ -41,13 +62,19 @@ def plot_carrying_capacity_params(params, time_horison = 25):
 
 if __name__ == '__main__':
 
-    y0 = (15,10)
+    y0 = (15,1,2,2)
     param_struct = namedtuple('Parameters', ['prey_growth_rate', 'prey_carrying_capacity',
                                              'erad_time','min_carrying_capacity',
-                                             'carrying_capacity_function','sigma'])
+                                             'carrying_capacity_function','sigma',
+                                             'mature_p1p2','mature_p2p3',
+                                             'p1_consumption','p2p3_consumption','p2_reprod_rate',
+                                             'p3_reprod_rate','lifespan'])
     params = param_struct(prey_growth_rate=1, prey_carrying_capacity=15,
-                          erad_time=2, min_carrying_capacity=y0[0]/2,
-                          carrying_capacity_function=carrying_capacity_params, sigma = .5)
+                          erad_time=2, min_carrying_capacity=y0[0]*.4,
+                          carrying_capacity_function=carrying_capacity_params, sigma = .11, mature_p1p2=1,
+                          mature_p2p3=1/7,
+                          p1_consumption=.15, p2p3_consumption=.2, p2_reprod_rate=0,
+                          p3_reprod_rate=2,lifespan=30)
 
     plot_carrying_capacity_params(params)
 
